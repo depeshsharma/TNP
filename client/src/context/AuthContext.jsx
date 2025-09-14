@@ -12,6 +12,9 @@ export const useAuth = () => {
 };
 
 export const AuthProvider = ({ children }) => {
+
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [token, setToken] = useState(localStorage.getItem('token'));
@@ -30,7 +33,7 @@ export const AuthProvider = ({ children }) => {
     const checkAuth = async () => {
       if (token) {
         try {
-          const response = await axios.get('http://localhost:5000/api/auth/me');
+          const response = await axios.get(`${backendUrl}/api/auth/me`);
           setUser(response.data.user);
         } catch (error) {
           console.error('Auth check failed:', error);
@@ -46,7 +49,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/login', {
+      const response = await axios.post(`${backendUrl}/api/auth/login`, {
         email,
         password
       });
@@ -69,7 +72,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/register', userData);
+      const response = await axios.post(`${backendUrl}/api/auth/register`, userData);
 
       const { token: newToken, user: newUser } = response.data;
       
@@ -96,7 +99,7 @@ export const AuthProvider = ({ children }) => {
 
   const updateProfile = async (profileData) => {
     try {
-      const response = await axios.put('http://localhost:5000/api/auth/profile', profileData);
+      const response = await axios.put(`${backendUrl}/api/auth/profile`, profileData);
       setUser(response.data.user);
       return { success: true };
     } catch (error) {

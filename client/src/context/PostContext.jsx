@@ -12,6 +12,9 @@ export const usePosts = () => {
 };
 
 export const PostProvider = ({ children }) => {
+
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagination, setPagination] = useState({
@@ -31,7 +34,8 @@ export const PostProvider = ({ children }) => {
         ...filters
       });
 
-      const response = await axios.get(`http://localhost:5000/api/posts?${params}`);
+
+      const response = await axios.get(`${backendUrl}/api/posts?${params}`);
       const { posts: newPosts, pagination: newPagination } = response.data.data;
 
       if (page === 1) {
@@ -50,7 +54,7 @@ export const PostProvider = ({ children }) => {
 
   const fetchPost = async (id) => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/posts/${id}`);
+      const response = await axios.get(`${backendUrl}/api/posts/${id}`);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching post:', error);
@@ -60,7 +64,7 @@ export const PostProvider = ({ children }) => {
 
   const createPost = async (postData) => {
     try {
-      const response = await axios.post('http://localhost:5000/api/posts', postData);
+      const response = await axios.post(`${backendUrl}/api/posts`, postData);
       const newPost = response.data.data;
       
       setPosts(prev => [newPost, ...prev]);
@@ -76,7 +80,7 @@ export const PostProvider = ({ children }) => {
 
   const updatePost = async (id, postData) => {
     try {
-      const response = await axios.put(`http://localhost:5000/api/posts/${id}`, postData);
+      const response = await axios.put(`${backendUrl}/api/posts/${id}`, postData);
       const updatedPost = response.data.data;
       
       setPosts(prev => 
@@ -95,7 +99,7 @@ export const PostProvider = ({ children }) => {
 
   const deletePost = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/posts/${id}`);
+      await axios.delete(`${backendUrl}/api/posts/${id}`);
       
       setPosts(prev => prev.filter(post => post._id !== id));
       return { success: true };
@@ -110,7 +114,7 @@ export const PostProvider = ({ children }) => {
 
   const likePost = async (id) => {
     try {
-      const response = await axios.post(`http://localhost:5000/api/posts/${id}/like`);
+      const response = await axios.post(`${backendUrl}/api/posts/${id}/like`);
       const { likes } = response.data;
       
       setPosts(prev => 
@@ -132,7 +136,7 @@ export const PostProvider = ({ children }) => {
   const searchPosts = async (query, page = 1) => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5000/api/posts/search/${query}?page=${page}&limit=10`);
+      const response = await axios.get(`${backendUrl}/api/posts/search/${query}?page=${page}&limit=10`);
       const { posts: searchResults, pagination: searchPagination } = response.data.data;
 
       if (page === 1) {
@@ -151,7 +155,7 @@ export const PostProvider = ({ children }) => {
 
   const getFeaturedPosts = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/posts/featured/list');
+      const response = await axios.get(`${backendUrl}/api/posts/featured/list`);
       return response.data.data;
     } catch (error) {
       console.error('Error fetching featured posts:', error);
@@ -162,7 +166,7 @@ export const PostProvider = ({ children }) => {
   const getPostsByCategory = async (category, page = 1) => {
     setLoading(true);
     try {
-      const response = await axios.get(`http://localhost:5000/api/posts/category/${category}?page=${page}&limit=10`);
+      const response = await axios.get(`${backendUrl}/api/posts/category/${category}?page=${page}&limit=10`);
       const { posts: categoryPosts, pagination: categoryPagination } = response.data.data;
 
       if (page === 1) {
