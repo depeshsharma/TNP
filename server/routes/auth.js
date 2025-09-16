@@ -17,14 +17,7 @@ router.post('/register', async (req, res) => {
     }
 
     // Create new user
-    const user = new User({
-      name,
-      email,
-      password,
-      department,
-      year
-    });
-
+    const user = new User({ name, email, password, department, year });
     await user.save();
 
     // Generate JWT token
@@ -49,6 +42,7 @@ router.post('/register', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log('Login request body:', req.body);
 
     // Find user by email
     const user = await User.findOne({ email });
@@ -57,7 +51,7 @@ router.post('/login', async (req, res) => {
     }
 
     // Check if user is active
-    if (!user.isActive) {
+    if (user.isActive === false) {
       return res.status(400).json({ message: 'Account is deactivated' });
     }
 
@@ -103,7 +97,7 @@ router.get('/me', auth, async (req, res) => {
 router.put('/profile', auth, async (req, res) => {
   try {
     const { name, bio, department, year, avatar } = req.body;
-    
+
     const user = await User.findById(req.user._id);
     if (!user) {
       return res.status(404).json({ message: 'User not found' });

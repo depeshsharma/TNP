@@ -54,6 +54,8 @@ export const AuthProvider = ({ children }) => {
         password
       });
 
+      console.log(response)
+
       const { token: newToken, user: userData } = response.data;
       
       localStorage.setItem('token', newToken);

@@ -40,7 +40,6 @@ const Login = () => {
     try {
       setLoading(true);
       setError('');
-      
       const result = await login(formData.email, formData.password);
       
       if (result.success) {
