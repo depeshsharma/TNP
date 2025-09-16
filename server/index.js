@@ -1,36 +1,44 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-require('dotenv').config({ path: './config.env' });
+const helmet = require('helmet');
+require('dotenv').config({ path: './.env' });
 
 const app = express();
 
-// Middleware
+// --- Check for critical env variables ---
+if (!process.env.JWT_SECRET) {
+  console.error("❌ JWT_SECRET is missing in config.env");
+  process.exit(1);
+}
+
+// --- Middleware ---
 app.use(cors());
+app.use(helmet()); // Adds security headers
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+// --- Routes ---
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/auth', require('./routes/auth'));
 
-// Health check
+// --- Health check ---
 app.get('/api/health', (req, res) => {
   res.json({ message: 'TNP Server is running!', status: 'OK' });
 });
 
-// Error handling middleware
+// --- Error handling middleware ---
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: 'Something went wrong!', error: err.message });
 });
 
-// 404 handler
+// --- 404 handler ---
 app.use('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-// Database connection
+// --- Database connection ---
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/tnp-website');
@@ -49,7 +57,7 @@ const connectDB = async () => {
   }
 };
 
-// Start server regardless of database connection
+// --- Start server regardless of database connection ---
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
@@ -58,5 +66,5 @@ app.listen(PORT, () => {
   console.log(`❤️  Health: http://localhost:5000/api/health\n`);
 });
 
-// Connect to database
+// --- Connect to database ---
 connectDB();
